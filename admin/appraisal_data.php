@@ -134,10 +134,43 @@
           echo 'Error getting tables from database: ' . $conn->error;
       }
   }
+$academicYear = $_SESSION['academic']['year'];
+$hodName = $_SESSION['login_name'];
+
+
+
+
+
+if (isset($_GET['fid'])) {
+    // ...
+
+    // Display the overall score
+    echo '<script>document.getElementById("score-value").textContent = "' . $overallScore . '";</script>';
+
+    // Check if the score already exists for the current teacher and academic year
+    $check_query = "SELECT * FROM final_score WHERE teacher_id = '$ftrid' AND academic_year = '$academicYear'";
+    $check_result = $conn->query($check_query);
+
+    if ($check_result->num_rows == 0) {
+        // No existing record found, insert the values into the final_score table
+        $insert_query = "INSERT INTO final_score (teacher_id, academic_year, total_score) VALUES ('$ftrid', '$academicYear', '$overallScore')";
+        $insert_result = $conn->query($insert_query);
+        if (!$insert_result) {
+            echo 'Error inserting data into final_score table: ' . $conn->error;
+        }
+    } else {
+        // Score already exists, display a message or perform any other desired action
+        echo 'Score already calculated for this teacher and academic year.';
+    }
+}
+
+
 
   // Close database connection
   $conn->close();
   ?>
+
+
 
   <script>
 $(document).ready(function() {
@@ -166,24 +199,64 @@ $(document).ready(function() {
     var teacherId = $('#faculty_id').val();
     var score = $('#generate-pdf-btn').attr('data-score'); // Get the score from the data-score attribute
     var teacherName = $('#faculty_id option:selected').text();
-    var hodName = 'Your HOD Name';
-    var academicYear = '2023-2024';
+    var hodName = '<?php echo $hodName; ?>';
 
-    var docDefinition = {
-      content: [
-        { text: 'Teacher Name: ' + teacherName, style: 'header' },
-        { text: 'HOD Name: ' + hodName, style: 'header' },
-        { text: 'Current Academic Year: ' + academicYear, style: 'header' },
-        { text: 'Score: ' + score, style: 'header' },
+var academicYear = '<?php echo $academicYear; ?>';
+
+
+
+  var currentDate = new Date().toLocaleString();
+
+var docDefinition = {
+  content: [
+    { text: 'FACULTY EVALUATION SYSTEM', style: 'heading' }, // Add the heading at the top
+    { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 595.28, y2: 10, lineWidth: 1 }] }, // Add the horizontal line
+    {
+      columns: [
+        { text: 'Teacher Name: ' + teacherName, style: 'leftColumn' }, // Align on the left side
+        { text: 'HOD Name: ' + hodName, style: 'rightColumn' } // Align on the right side
       ],
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 20, 0, 10]
-        }
-      }
-    };
+      margin: [0, 20, 0, 10]
+    },
+    { text: 'Current Academic Year: ' + academicYear, style: 'header' },
+    { text: 'Score: ' + score, style: 'header' },
+    { text: 'Generated Date: ' + currentDate, style: 'footer' } // Add the generated date at the bottom
+  ],
+  styles: {
+    heading: {
+      fontSize: 24,
+      bold: true,
+      alignment: 'center',
+      margin: [0, 0, 0, 20]
+    },
+    leftColumn: {
+      fontSize: 18,
+      bold: true,
+      alignment: 'left',
+      margin: [0, 0, 0, 10]
+    },
+    rightColumn: {
+      fontSize: 18,
+      bold: true,
+      alignment: 'right',
+      margin: [0, 0, 0, 10]
+    },
+    header: {
+      fontSize: 18,
+      bold: true,
+      margin: [0, 20, 0, 10]
+    },
+    footer: {
+      fontSize: 8,
+      italics: true,
+      alignment: 'right',
+      margin: [0, 50, 20, 0]
+    }
+  }
+};
+
+
+
 
     pdfMake.createPdf(docDefinition).download('report.pdf');
   });
@@ -193,8 +266,9 @@ $(document).ready(function() {
   });
 });
 
-
   </script>
+
+  
 </body>
 </html>
 
@@ -210,7 +284,7 @@ $(document).ready(function() {
   $(document).ready(function(){
     $('#faculty_id').change(function(){
       if($(this).val() > 0)
-      window.history.pushState({}, null, './index.php?page=appraisal_details_test&fid='+$(this).val());
+      window.history.pushState({}, null, './index.php?page=appraisal_data&fid='+$(this).val());
       load_class()
     })
     if($('#faculty_id').val() > 0)

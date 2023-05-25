@@ -1,8 +1,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <div class="dropdown">
    	<a href="./" class="brand-link">
-        <h3 class="text-center p-0 m-0"><b>Admin Panel</b></h3>
-
+        <h3 class="text-center p-0 m-0"><b>HOD Panel</b></h3>
     </a>
       
     </div>
@@ -42,14 +41,7 @@
             </a>
           </li> 
           
-          <li class="nav-item dropdown">
-            <a href="./index.php?page=criteria_list" class="nav-link nav-criteria_list">
-              <i class="nav-icon fas fa-list-alt"></i>
-              <p>
-                Evaluation Criteria
-              </p>
-            </a>
-          </li> 
+           
           <li class="nav-item">
             <a href="#" class="nav-link nav-edit_faculty">
               <i class="nav-icon fas fa-user-friends"></i>
@@ -72,25 +64,27 @@
                 </a>
               </li>
             </ul>
+          </li> 
+          
+
+          <li class="nav-item dropdown">
+            <a href="./index.php?page=allocation" class="nav-link nav-allocation">
+              <i class="nav-icon fas fa-file-alt"></i>
+              <p>
+                Subject Allocation
+              </p>
+            </a>
           </li>
 
-          <li class="nav-item dropdown">
-            <a href="./index.php?page=appraisal_details" class="nav-link nav-subject_list">
-              <i class="nav-icon fas fa-th-list"></i>
-              <p>
-                APPRAISAL DATA
-              </p>
-            </a>
-          </li> 
+            <li class="nav-item dropdown">
+          <a href="./index.php?page=appraisal_data" class="nav-link nav-appraisal_data">
+          <i class="nav-icon fas fa-th-list"></i>
+          <p>
+          Appraisal
+          </p>
+           </a>
+          </li>
 
-          <li class="nav-item dropdown">
-            <a href="./index.php?page=appraisal_details_test" class="nav-link nav-subject_list">
-              <i class="nav-icon fas fa-th-list"></i>
-              <p>
-                APPRAISAL TEST
-              </p>
-            </a>
-          </li> 
           
           <li class="nav-item dropdown">
             <a href="./index.php?page=report" class="nav-link nav-report">
@@ -104,6 +98,8 @@
       </nav>
     </div>
   </aside>
+
+
   <script>
   	$(document).ready(function(){
       var page = '<?php echo isset($_GET['page']) ? $_GET['page'] : 'home' ?>';
