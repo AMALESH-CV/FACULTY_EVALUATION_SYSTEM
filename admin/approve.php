@@ -32,6 +32,9 @@ if (isset($_GET['table']) && isset($_GET['teacher_id'])) {
       case 'add_on_teaching':
         $select_query = "SELECT hours_taken_1/hours_planned_1*25 + hours_taken_2/hours_planned_2*25 AS score FROM $table_name WHERE teacher_id = $teacher_id";
         break;
+      case "innovative_teaching":
+        $select_query = "SELECT IF(methodology_name IS NOT NULL AND improvements IS NOT NULL, 25, 0) AS score FROM $table_name WHERE teacher_id = $teacher_id";
+        break;
 
       // add more cases for other tables here
       default:

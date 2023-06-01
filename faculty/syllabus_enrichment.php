@@ -1,5 +1,7 @@
 <?php
+$academicYear = $_SESSION['academic']['year'];
 ?>
+<h3>Academic Year: <?php echo $academicYear; ?></h3>
 <form form action="" id="manage_syllabus">
   <div id="msg" class="form-group"></div>
   <div class="form-group">
@@ -22,6 +24,8 @@
     <label for="proof">Proof Document:</label>
     <input type="file" class="form-control-file" id="proof" name="proof" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required value="<?php echo isset($proof) ? $proof : '' ?>">
   </div>
+   <!-- Add a hidden input field for academic year -->
+  <input type="hidden" name="academic_year" value="<?php echo $academicYear; ?>">
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 

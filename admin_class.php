@@ -691,8 +691,15 @@ Class Action {
 	function save_teaching_hours(){
 		extract($_POST);
 		
+// Check if the teacher ID and academic year combination already exists in the database
+    $check_existing = $this->db->query("SELECT * FROM teaching_hours WHERE teacher_id = {$_SESSION['login_id']} AND academic_year = '$academic_year'");
+    if ($check_existing->num_rows > 0) {
+        return 2; // Return an error code to indicate that the data already exists for the specified academic year
+        exit;
+    }
+
 		$data = " teacher_id = {$_SESSION['login_id']} "; 
-		
+		$data .= ", academic_year = '$academic_year' ";
 		$data .= ", theory_planned = $theory_planned ";
 		$data .= ", theory_engaged = $theory_engaged ";
 		$data .= ", practical_planned = $practical_planned ";
@@ -716,39 +723,52 @@ Class Action {
 	}
 
 	function save_add_on_teaching(){
-		extract($_POST);
-		
-		$data = " teacher_id = {$_SESSION['login_id']} "; 
-		
-		$data .= ", subject_1 = '$subject_1' ";
-		$data .= ", hours_planned_1 = $hours_planned_1 ";
-		$data .= ", hours_taken_1 = $hours_taken_1 ";
-		$data .= ", subject_2 = '$subject_2' ";
-		$data .= ", hours_planned_2 = $hours_planned_2 ";
-		$data .= ", hours_taken_2 = $hours_taken_2 ";
+	extract($_POST);
 
-		if(isset($_FILES['proof']) && $_FILES['proof']['tmp_name'] != ''){
-			$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['proof']['name'];
-			$move = move_uploaded_file($_FILES['proof']['tmp_name'],'assets/uploads/'. $fname);
-			$data .= ", proof = '$fname' ";
-		}
+	// Check if the teacher ID and academic year combination already exists in the database
+    $check_existing = $this->db->query("SELECT * FROM add_on_teaching WHERE teacher_id = {$_SESSION['login_id']} AND academic_year = '$academic_year'");
+    if ($check_existing->num_rows > 0) {
+        return 2; // Return an error code to indicate that the data already exists for the specified academic year
+        exit;
+    }
 
-		$save = $this->db->query("INSERT INTO add_on_teaching set $data");
-		if($save){
-		
-				return 1;
-		}else{
-			return 2;
-			exit;
-		}
-		
+	$data = " teacher_id = {$_SESSION['login_id']} ";
+	$data .= ", academic_year = '$academic_year' ";
+	$data .= ", subject_1 = '$subject_1' ";
+	$data .= ", hours_planned_1 = $hours_planned_1 ";
+	$data .= ", hours_taken_1 = $hours_taken_1 ";
+	$data .= ", subject_2 = '$subject_2' ";
+	$data .= ", hours_planned_2 = $hours_planned_2 ";
+	$data .= ", hours_taken_2 = $hours_taken_2 ";
+
+	if(isset($_FILES['proof']) && $_FILES['proof']['tmp_name'] != ''){
+		$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['proof']['name'];
+		$move = move_uploaded_file($_FILES['proof']['tmp_name'],'assets/uploads/'. $fname);
+		$data .= ", proof = '$fname' ";
 	}
+
+	$save = $this->db->query("INSERT INTO add_on_teaching set $data");
+	if($save){
+		return 1;
+	}else{
+		return 2;
+		exit;
+	}
+}
+
 
 	function save_syllabus(){
 		extract($_POST);
+
+		// Check if the teacher ID and academic year combination already exists in the database
+    $check_existing = $this->db->query("SELECT * FROM syllabus_enrichment WHERE teacher_id = {$_SESSION['login_id']} AND academic_year = '$academic_year'");
+    if ($check_existing->num_rows > 0) {
+        return 2; // Return an error code to indicate that the data already exists for the specified academic year
+        exit;
+    }
 		
 		$data = " teacher_id = {$_SESSION['login_id']} "; 
-		
+		$data .= ", academic_year = '$academic_year' ";
 		$data .= ", additional_topics = '$additional_topics' ";
 		$data .= ", experiments = '$experiments' ";
 		$data .= ", hours_planned = $hours_planned ";
@@ -773,9 +793,16 @@ Class Action {
 
 	function save_innovative(){
 		extract($_POST);
+
+		// Check if the teacher ID and academic year combination already exists in the database
+    $check_existing = $this->db->query("SELECT * FROM innovative_teaching WHERE teacher_id = {$_SESSION['login_id']} AND academic_year = '$academic_year'");
+    if ($check_existing->num_rows > 0) {
+        return 2; // Return an error code to indicate that the data already exists for the specified academic year
+        exit;
+    }
 		
 		$data = " teacher_id = {$_SESSION['login_id']} "; 
-		
+		$data .= ", academic_year = '$academic_year' ";
 		$data .= ", methodology_name = '$methodology_name' ";
 		$data .= ", m_description = '$m_description' ";
 		$data .= ", improvements = '$improvements' ";

@@ -85,15 +85,7 @@
            </a>
           </li>
 
-          
-          <li class="nav-item dropdown">
-            <a href="./index.php?page=report" class="nav-link nav-report">
-              <i class="nav-icon fas fa-list-alt"></i>
-              <p>
-                Evaluation Report
-              </p>
-            </a>
-          </li>
+       
         </ul>
       </nav>
     </div>

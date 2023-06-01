@@ -28,11 +28,20 @@
             </a>
           </li>
 
-           <li class="nav-item dropdown">
+          <li class="nav-item dropdown">
             <a href="./index.php?page=result" class="nav-link nav-result">
               <i class="nav-icon fas fa-th-list"></i>
               <p>
-                Evaluation Result
+                my subjects
+              </p>
+            </a>
+          </li>
+
+           <li class="nav-item dropdown">
+            <a href="./index.php?page=view_scores" class="nav-link nav-scores">
+              <i class="nav-icon fas fa-th-list"></i>
+              <p>
+                My Appraisal Score
               </p>
             </a>
           </li>

@@ -19,9 +19,9 @@ header("location:index.php?page=home");
 
 ?>
 <?php include 'header.php' ?>
-<body class="hold-transition login-page bg-black">
-  <h2><b><?php echo $_SESSION['system']['name'] ?> - Admin</b></h2>
-<div class="login-box">
+<body class="hold-transition login-page bg-teal">
+  <h2 style="background-color:black;color:white;width:500px;text-align:center;border-radius:12px;"><b><?php echo $_SESSION['system']['name'] ?></b></h2>
+<div class="login-box" style="width:500px;">
   <div class="login-logo">
     <a href="#" class="text-white"></a>
   </div>

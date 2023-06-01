@@ -1,9 +1,8 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <!DOCTYPE html>
 <html>
 <head>
   <title>Generate PDF Report</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
 </head>
@@ -73,7 +72,12 @@
       </div>
   </div>
 
+
+
+
   <?php
+  $academicYear = $_SESSION['academic']['year'];
+$hodName = $_SESSION['login_name'];
   // Check if teacher ID is set
   if (isset($_GET['fid'])) {
       $ftrid = $_GET['fid'];
@@ -89,53 +93,78 @@
           // Initialize overall score variable
           $overallScore = 0;
 
-          // Loop through tables and display them
-          while ($table_row = $tables_result->fetch_array()) {
-              $table_name = $table_row[0];
-              // Query to get table columns
-              $columns_query = "SHOW COLUMNS FROM $table_name";
-              $columns_result = $conn->query($columns_query);
-              // Build table HTML
-              $table_html = '<table>';
-              $table_html .= '<tr><th colspan="' . $columns_result->num_rows . '"><h3 style="font-family: Arial, sans-serif; font-weight: bold; margin-top: 20px; margin-bottom: 20px;">' . $table_name . '</h3></th></tr>';
-              $table_html .= '<tr>';
-              while ($column_row = $columns_result->fetch_array()) {
-                  $table_html .= '<th style="background-color:#eee; padding:10px; border:1px solid #ddd;">' . $column_row[0] . '</th>';
-              }
-              $table_html .= '<th style="background-color:#eee; padding:10px; border:1px solid #ddd;">Action</th></tr>';
-              // Query to get table data for the teacher ID
-              $data_query = "SELECT * FROM $table_name WHERE teacher_id = $ftrid ";
-              $data_result = $conn->query($data_query);
-              while ($data_row = $data_result->fetch_array()) {
-                  $table_html .= '<tr>';
-                  for ($i = 0; $i < $data_result->field_count; $i++) {
-                      $table_html .= '<td style="padding:10px; border:1px solid #ddd;">' . $data_row[$i] . '</td>';
-                  }
-                  $table_html .= '<td style="padding:10px; border:1px solid #ddd;"><a href="admin/approve.php?table=' . $table_name . '&teacher_id=' . $data_row[0] . '">Approve</a> | <a href="admin/reject.php?table=' . $table_name . '&teacher_id=' . $data_row[0] . '">Reject</a></td></tr>';
+         // Get the current academic year
+$academicYear = $_SESSION['academic']['year'];
 
-                  // Retrieve the score value from the 'score' field
-                  $score = $data_row['score'];
-                  // Add the score to the overall score
-                  $overallScore += $score;
-              }
-              $table_html .= '</table>';
-              // Display table HTML
-              echo '<div class="col-md-12" style="margin-top:20px; margin-bottom:20px;">';
-              echo '<div class="callout callout-info">';
-              echo $table_html;
-              echo '</div>';
-              echo '</div>';
-          }
 
-          // Display the overall score
-          echo '<script>document.getElementById("score-value").textContent = "' . $overallScore . '";</script>';
+
+// Loop through tables and display them
+while ($table_row = $tables_result->fetch_array()) {
+    $table_name = $table_row[0];
+    // Query to get table columns
+    $columns_query = "SHOW COLUMNS FROM $table_name";
+    $columns_result = $conn->query($columns_query);
+    // Build table HTML
+    $table_html = '<table>';
+    $table_html .= '<tr><th colspan="' . ($columns_result->num_rows - 2) . '"><h3 style="font-family: Arial, sans-serif; font-weight: bold; margin-top: 20px; margin-bottom: 20px;">' . $table_name . '</h3></th></tr>';
+    $table_html .= '<tr>';
+    $column_names = array();
+    $columns_result->fetch_array(); // Skip the first column
+    $columns_result->fetch_array(); // Skip the second column
+    while ($column_row = $columns_result->fetch_array()) {
+        $column_name = $column_row[0];
+        $column_names[] = $column_name;
+        $table_html .= '<th style="background-color:#eee; padding:10px; border:1px solid #ddd;">' . $column_name . '</th>';
+    }
+    $table_html .= '<th style="background-color:#eee; padding:10px; border:1px solid #ddd;">Action</th></tr>';
+    // Query to get table data for the teacher ID and current academic year
+    $data_query = "SELECT * FROM $table_name WHERE teacher_id = $ftrid AND academic_year = '$academicYear'";
+    $data_result = $conn->query($data_query);
+    while ($data_row = $data_result->fetch_array()) {
+        $table_html .= '<tr>';
+        foreach ($column_names as $column_name) {
+            if ($column_name === 'proof') {
+                // Retrieve the proof file name and location
+                $proofFile = $data_row[$column_name];
+
+                // Create a download link for the proof file
+                $proofLink = '<a href="assets/uploads/' . $proofFile . '">Download</a>'; // Update 'path/to/proof/files/' with the actual path
+
+                $table_html .= '<td style="padding:10px; border:1px solid #ddd;">' . $proofLink . '</td>'; // Add the proof download link
+            } else {
+                $table_html .= '<td style="padding:10px; border:1px solid #ddd;">' . $data_row[$column_name] . '</td>';
+            }
+        }
+        $table_html .= '<td style="padding:10px; border:1px solid #ddd;"><a href="admin/approve.php?table=' . $table_name . '&teacher_id=' . $data_row[1] . '">Approve</a> | <a href="admin/reject.php?table=' . $table_name . '&teacher_id=' . $data_row[1] . '">Reject</a></td></tr>';
+        
+
+        // Retrieve the score value from the 'score' field
+        $score = $data_row['score'];
+        // Add the score to the overall score
+        $overallScore += $score;
+    }
+    $table_html .= '</table>';
+    // Display table HTML
+    echo '<div class="col-md-12" style="margin-top:20px; margin-bottom:20px;">';
+    echo '<div class="callout callout-info">';
+    echo $table_html;
+    echo '</div>';
+    echo '</div>';
+}
+
+
+
+
+// Display the overall score
+echo '<script>document.getElementById("score-value").textContent = "' . $overallScore . '";</script>';
+
+
       } else {
           // Display error message if query failed
           echo 'Error getting tables from database: ' . $conn->error;
       }
   }
-$academicYear = $_SESSION['academic']['year'];
-$hodName = $_SESSION['login_name'];
+
 
 
 
@@ -169,104 +198,113 @@ if (isset($_GET['fid'])) {
   // Close database connection
   $conn->close();
   ?>
+ <div id="feedback-container">
+  <div class="col-md-12" style="margin-top: 20px;">
+    <h3>Feedback</h3>
+    <form id="feedback-form">
+      <div class="form-group">
+        <label for="feedback-text">Enter your feedback:</label>
+        <textarea class="form-control" id="feedback-text" rows="3"></textarea>
+      </div>
+      <button type="button" class="btn btn-primary" id="submit-feedback-btn">Submit Feedback</button>
+    </form>
+  </div>
+</div>
 
 
 
   <script>
-$(document).ready(function() {
-  $('#calculate-score-btn').click(function() {
-    var facultyId = $('#faculty_id').val();
-    if (facultyId) {
-      $.ajax({
-        url: 'admin/fetch_scores.php',
-        type: 'GET',
-        data: { fid: facultyId },
-        success: function(response) {
-          var score = parseFloat(response).toFixed(2); // Limit float portion to 2 digits
-          $('#overall-score').text('Overall Score: ' + score);
-          $('#score-value').text(score);
-          $('#score-container').show();
-          $('#generate-pdf-btn').attr('data-score', score); // Update the data-score attribute
-        },
-        error: function() {
-          alert('Error occurred while fetching the score.');
+  $(document).ready(function() {
+    $('#calculate-score-btn').click(function() {
+      var facultyId = $('#faculty_id').val();
+      if (facultyId) {
+        $.ajax({
+          url: 'admin/fetch_scores.php',
+          type: 'GET',
+          data: { fid: facultyId },
+          success: function(response) {
+            var feedback = $('#feedback-text').val(); // Get the feedback text from the form
+            var score = parseFloat(response).toFixed(2); // Limit float portion to 2 digits
+            $('#overall-score').text('Overall Score: ' + score);
+            $('#score-value').text(score);
+            $('#score-container').show();
+            $('#generate-pdf-btn').attr('data-score', score); // Update the data-score attribute
+          },
+          error: function() {
+            alert('Error occurred while fetching the score.');
+          }
+        });
+      }
+    });
+
+    $('#generate-pdf-btn').click(function() {
+      var teacherId = $('#faculty_id').val();
+      var score = $('#generate-pdf-btn').attr('data-score'); // Get the score from the data-score attribute
+      var teacherName = $('#faculty_id option:selected').text();
+      var hodName = '<?php echo $hodName; ?>';
+      var academicYear = '<?php echo $academicYear; ?>';
+
+      var currentDate = new Date().toLocaleString();
+      var docDefinition = {
+        content: [
+          { text: 'FACULTY EVALUATION SYSTEM', style: 'heading' }, // Add the heading at the top
+          { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 595.28, y2: 10, lineWidth: 1 }] }, // Add the horizontal line
+          {
+            columns: [
+              { text: 'Teacher Name: ' + teacherName, style: 'leftColumn' }, // Align on the left side
+              { text: 'HOD Name: ' + hodName, style: 'rightColumn' } // Align on the right side
+            ],
+            margin: [0, 20, 0, 10]
+          },
+          { text: 'Current Academic Year: ' + academicYear, style: 'header' },
+          { text: 'Score: ' + score, style: 'header' },
+          { text: 'Generated Date: ' + currentDate, style: 'footer' } // Add the generated date at the bottom
+        ],
+        styles: {
+          heading: {
+            fontSize: 24,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 20]
+          },
+          leftColumn: {
+            fontSize: 18,
+            bold: true,
+            alignment: 'left',
+            margin: [0, 0, 0, 10]
+          },
+          rightColumn: {
+            fontSize: 18,
+            bold: true,
+            alignment: 'right',
+            margin: [0, 0, 0, 10]
+          },
+          header: {
+            fontSize: 18,
+            bold: true,
+            margin: [0, 20, 0, 10]
+          },
+          footer: {
+            fontSize: 8,
+            italics: true,
+            alignment: 'right',
+            margin: [0, 50, 20, 0]
+          }
         }
-      });
-    }
+      };
+
+      var feedback = $('#feedback-text').val(); // Get the feedback text from the form
+      docDefinition.content.push({ text: 'Feedback: ' + feedback, style: 'feedback' }); // Add the feedback text to the PDF content
+
+      pdfMake.createPdf(docDefinition).download('report.pdf');
+    });
+
+    $('#print-btn').click(function() {
+      window.print();
+    });
   });
+</script>
 
-  $('#generate-pdf-btn').click(function() {
-    var teacherId = $('#faculty_id').val();
-    var score = $('#generate-pdf-btn').attr('data-score'); // Get the score from the data-score attribute
-    var teacherName = $('#faculty_id option:selected').text();
-    var hodName = '<?php echo $hodName; ?>';
-
-var academicYear = '<?php echo $academicYear; ?>';
-
-
-
-  var currentDate = new Date().toLocaleString();
-
-var docDefinition = {
-  content: [
-    { text: 'FACULTY EVALUATION SYSTEM', style: 'heading' }, // Add the heading at the top
-    { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 595.28, y2: 10, lineWidth: 1 }] }, // Add the horizontal line
-    {
-      columns: [
-        { text: 'Teacher Name: ' + teacherName, style: 'leftColumn' }, // Align on the left side
-        { text: 'HOD Name: ' + hodName, style: 'rightColumn' } // Align on the right side
-      ],
-      margin: [0, 20, 0, 10]
-    },
-    { text: 'Current Academic Year: ' + academicYear, style: 'header' },
-    { text: 'Score: ' + score, style: 'header' },
-    { text: 'Generated Date: ' + currentDate, style: 'footer' } // Add the generated date at the bottom
-  ],
-  styles: {
-    heading: {
-      fontSize: 24,
-      bold: true,
-      alignment: 'center',
-      margin: [0, 0, 0, 20]
-    },
-    leftColumn: {
-      fontSize: 18,
-      bold: true,
-      alignment: 'left',
-      margin: [0, 0, 0, 10]
-    },
-    rightColumn: {
-      fontSize: 18,
-      bold: true,
-      alignment: 'right',
-      margin: [0, 0, 0, 10]
-    },
-    header: {
-      fontSize: 18,
-      bold: true,
-      margin: [0, 20, 0, 10]
-    },
-    footer: {
-      fontSize: 8,
-      italics: true,
-      alignment: 'right',
-      margin: [0, 50, 20, 0]
-    }
-  }
-};
-
-
-
-
-    pdfMake.createPdf(docDefinition).download('report.pdf');
-  });
-
-  $('#print-btn').click(function() {
-    window.print();
-  });
-});
-
-  </script>
 
   
 </body>

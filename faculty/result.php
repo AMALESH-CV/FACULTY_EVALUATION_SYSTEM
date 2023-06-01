@@ -16,9 +16,6 @@ function ordinal_suffix($num){
 <div class="col-lg-12">
 	<div class="row">
 		<div class="col-md-12 mb-1">
-			<div class="d-flex justify-content-end w-100">
-				<button class="btn btn-sm btn-success bg-gradient-success" style="display:none" id="print-btn"><i class="fa fa-print"></i> Print</button>
-			</div>
 		</div>
 	</div>
 	<div class="row">
@@ -29,64 +26,8 @@ function ordinal_suffix($num){
 				</div>
 			</div>
 		</div>
-		<div class="col-md-9">
-			<div class="callout callout-info" id="printable">
-			<div>
-			<h3 class="text-center">Evaluation Report</h3>
-			<hr>
-			<table width="100%">
-					<tr>
-						<td width="50%"><p><b>Academic Year: <span id="ay"><?php echo $_SESSION['academic']['year'].' '.(ordinal_suffix($_SESSION['academic']['semester'])) ?> Semester</span></b></p></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td width="50%"><p><b>Class: <span id="classField"></span></b></p></td>
-						<td width="50%"><p><b>Subject: <span id="subjectField"></span></b></p></td>
-					</tr>
-			</table>
-				<p class=""><b>Total Student Evaluated: <span id="tse"></span></b></p>
-			</div>
-				<fieldset class="border border-info p-2 w-100">
-				   <legend  class="w-auto">Rating Legend</legend>
-				   <p>5 = Strongly Agree, 4 = Agree, 3 = Uncertain, 2 = Disagree, 1 = Strongly Disagree</p>
-				</fieldset>
-				<?php 
-							$q_arr = array();
-						$criteria = $conn->query("SELECT * FROM criteria_list where id in (SELECT criteria_id FROM question_list where academic_id = {$_SESSION['academic']['id']} ) order by abs(order_by) asc ");
-						while($crow = $criteria->fetch_assoc()):
-					?>
-					<table class="table table-condensed wborder">
-						<thead>
-							<tr class="bg-gradient-secondary">
-								<th class=" p-1"><b><?php echo $crow['criteria'] ?></b></th>
-								<th width="5%" class="text-center">1</th>
-								<th width="5%" class="text-center">2</th>
-								<th width="5%" class="text-center">3</th>
-								<th width="5%" class="text-center">4</th>
-								<th width="5%" class="text-center">5</th>
-							</tr>
-						</thead>
-						<tbody class="tr-sortable">
-							<?php 
-							$questions = $conn->query("SELECT * FROM question_list where criteria_id = {$crow['id']} and academic_id = {$_SESSION['academic']['id']} order by abs(order_by) asc ");
-							while($row=$questions->fetch_assoc()):
-							$q_arr[$row['id']] = $row;
-							?>
-							<tr class="bg-white">
-								<td class="p-1" width="40%">
-									<?php echo $row['question'] ?>
-								</td>
-								<?php for($c=1;$c<=5;$c++): ?>
-								<td class="text-center">
-									<span class="rate_<?php echo $c.'_'.$row['id'] ?> rates"></span>
-			                      </div>
-								</td>
-								<?php endfor; ?>
-							</tr>
-							<?php endwhile; ?>
-						</tbody>
-					</table>
-					<?php endwhile; ?>
+		
+				
 			</div>
 		</div>
 	</div>
